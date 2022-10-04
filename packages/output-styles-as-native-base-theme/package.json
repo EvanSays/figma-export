@@ -1,0 +1,36 @@
+{
+    "name": "@figma-export/output-styles-as-native-base-theme",
+    "version": "4.5.1",
+    "description": "Outputter for @figma-export that exports styles to a Native Base theme",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marcomontalbano/figma-exporter.git",
+        "directory": "packages/output-styles-as-native-base-theme"
+    },
+    "author": "Marco Montalbano",
+    "keywords": [
+        "figma",
+        "export",
+        "design",
+        "icons",
+        "typography",
+        "components",
+        "sass",
+        "scss",
+        "native base"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@figma-export/types": "^4.5.1",
+        "@figma-export/utils": "^4.5.1",
+        "rgb-hex": "^4.0.0"
+    },
+    "engines": {
+        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
+    }
+}
