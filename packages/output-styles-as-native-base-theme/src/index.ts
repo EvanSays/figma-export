@@ -1,7 +1,9 @@
 import * as FigmaExport from '@figma-export/types';
 import { kebabCase } from '@figma-export/utils';
 
-import { writeVariable, rgba2hex } from './utils';
+import {
+    rgba2hex, fontWeightMapping, fontSizeMapping,
+} from './utils';
 import { Extension } from './types';
 
 import fs = require('fs');
@@ -14,12 +16,29 @@ type Options = {
     getVariableName?: (style: FigmaExport.Style) => string;
 }
 
-type Colors = {
+type Weights = {
     [key: string]: string;
 }
 
+type Colors = {
+    [key: string]: Weights;
+}
+
+type FontWeight = {
+    [type: string]: string;
+}
+
+type FontSize = {
+    [type: string]: string
+}
+
 type Obj = {
-    colors: Colors
+    colors: Colors;
+    fontSizes: FontSize;
+    letterSpacings: string[];
+    lineHeights: string[]
+    fontWeights: FontWeight;
+    // fontConfig: Theme;
 }
 
 export = ({
@@ -30,17 +49,19 @@ export = ({
 }: Options): FigmaExport.StyleOutputter => {
     return async (styles) => {
         const extension = getExtension();
-
         const obj:Obj = {
             colors: {},
-            // typography: {
-            //     letterSpacings: {},
-            //     lineHeights: {},
-            //     fontWeights: {},
-            //     fontSizes: {},
-            //     fontConfig: {},
-            // },
+            fontWeights: {},
+            fontSizes: {},
+            letterSpacings: [],
+            lineHeights: [],
+            // fontConfig: {},
         };
+
+        const fontWeights = new Set<number>();
+        const fontSizes = new Set<number>();
+        // const letterSpacings = new Set<string>();
+        // const lineHeights = new Set<string>();
 
         styles.forEach((style) => {
             if (style.visible) {
@@ -49,11 +70,22 @@ export = ({
                 // eslint-disable-next-line default-case
                 switch (style.styleType) {
                     case 'FILL': {
+                        const filterOutColors = /(gradient)|(greyscale)|(transparent)/;
+                        if (variableName.match(filterOutColors)) {
+                            break;
+                        }
+
                         const value = style.fills
                             .filter((fill) => fill.visible)
                             .map((fill) => fill.value)
                             .join(', ');
-                        obj.colors = { ...obj.colors, ...writeVariable(variableName, rgba2hex(value)) };
+
+                        // move to a helper function for separating names from weights.
+                        const lastHyphen = variableName.lastIndexOf('-');
+                        const name = variableName.substring(0, lastHyphen);
+                        const weight = variableName.substring(lastHyphen + 1);
+
+                        obj.colors = { ...obj.colors, [name]: { ...obj.colors[name], [weight]: rgba2hex(value) } };
                         break;
                     }
 
@@ -77,33 +109,28 @@ export = ({
                     }
 
                     case 'TEXT': {
-                        // const value = `(
-                        //     "font-family": "${style.style.fontFamily}",
-                        //     "font-size": ${style.style.fontSize}px,
-                        //     "font-style": ${style.style.fontStyle},
-                        //     "font-variant": ${style.style.fontVariant},
-                        //     "font-weight": ${style.style.fontWeight},
-                        //     "letter-spacing": ${style.style.letterSpacing}px,
-                        //     "line-height": ${style.style.lineHeight}px,
-                        //     "text-align": ${style.style.textAlign},
-                        //     "text-decoration": ${style.style.textDecoration},
-                        //     "text-transform": ${style.style.textTransform},
-                        //     "vertical-align": ${style.style.verticalAlign}
-                        // )`;
+                        // const {
+                        //     fontWeight, fontSize, letterSpacing, lineHeight,
+                        // }: { fontWeight: string, fontSize: string, letterSpacing: string, lineHeight: string} = style.style;
+                        const {
+                            fontWeight,
+                            fontSize,
+                        }: { fontWeight: number, fontSize: number } = style.style;
 
-                        // text += writeVariable(style.comment, variableName, value);
-                        // obj = {};
+                        fontWeights.add(fontWeight);
+                        fontSizes.add(fontSize);
+                        // letterSpacings.add(letterSpacing);
+                        // lineHeights.add(lineHeight);
                         break;
                     }
                 }
             }
         });
 
-        const ordered = Object.keys(obj.colors).sort().reduce((acc, key) => {
-            return { ...acc, [key]: obj.colors[key] };
-        }, {});
-
-        obj.colors = ordered;
+        obj.fontWeights = fontWeightMapping(fontWeights);
+        obj.fontSizes = fontSizeMapping(fontSizes);
+        // obj.letterSpacings = Array.from(new Set(letterSpacings)).sort();
+        // obj.lineHeights = Array.from(new Set(lineHeights)).sort();
 
         const filePath = path.resolve(output);
         fs.mkdirSync(filePath, { recursive: true });
