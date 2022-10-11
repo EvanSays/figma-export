@@ -72,6 +72,7 @@ const mockText = (visible = true): Style => ({
         fontFamily: 'Verdana',
         fontSize: 12,
         fontStyle: 'italic',
+        fontPostScriptName: 'verdana-italic',
         fontVariant: 'normal',
         fontWeight: 100,
         letterSpacing: 10,

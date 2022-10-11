@@ -8,6 +8,8 @@ export type VerticalAlign = 'top' | 'middle' | 'bottom'
 export type TextStyle = {
     /** Font family of text (standard name) */
     fontFamily: string;
+    /** Font family of text (post script name) */
+    fontPostScriptName: string;
     /** Numeric font weight */
     fontWeight: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
     /** Font size in px */

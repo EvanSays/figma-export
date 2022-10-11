@@ -1,8 +1,9 @@
 import * as FigmaExport from '@figma-export/types';
 import { kebabCase } from '@figma-export/utils';
+import merge from 'lodash.merge';
 
 import {
-    rgba2hex, fontWeightMapping, fontSizeMapping,
+    rgba2hex, fontWeightMapping, sizeMapping, letterSpaceMapping,
 } from './utils';
 import { Extension } from './types';
 
@@ -28,17 +29,25 @@ type FontWeight = {
     [type: string]: string;
 }
 
+type Font = {
+    [type: number]: FontWeight;
+}
+
 type FontSize = {
-    [type: string]: string
+    [type: string]: Font;
+}
+
+type LetterSpacing = {
+    [type: number]: number;
 }
 
 type Obj = {
     colors: Colors;
     fontSizes: FontSize;
-    letterSpacings: string[];
-    lineHeights: string[]
+    letterSpacings: LetterSpacing;
+    lineHeights: LetterSpacing,
     fontWeights: FontWeight;
-    // fontConfig: Theme;
+    fontConfig: FontSize;
 }
 
 export = ({
@@ -55,13 +64,13 @@ export = ({
             fontSizes: {},
             letterSpacings: [],
             lineHeights: [],
-            // fontConfig: {},
+            fontConfig: {},
         };
 
         const fontWeights = new Set<number>();
         const fontSizes = new Set<number>();
-        // const letterSpacings = new Set<string>();
-        // const lineHeights = new Set<string>();
+        const letterSpacings = new Set<number>();
+        const lineHeights = new Set<number>();
 
         styles.forEach((style) => {
             if (style.visible) {
@@ -109,28 +118,46 @@ export = ({
                     }
 
                     case 'TEXT': {
-                        // const {
-                        //     fontWeight, fontSize, letterSpacing, lineHeight,
-                        // }: { fontWeight: string, fontSize: string, letterSpacing: string, lineHeight: string} = style.style;
                         const {
                             fontWeight,
                             fontSize,
-                        }: { fontWeight: number, fontSize: number } = style.style;
-
+                            letterSpacing,
+                            lineHeight,
+                            fontStyle,
+                            fontFamily,
+                            fontPostScriptName,
+                        }: {
+                            fontPostScriptName: string,
+                            fontWeight: number,
+                            fontSize: number,
+                            letterSpacing: number,
+                            lineHeight: number,
+                            fontStyle: string,
+                            fontFamily: string,
+                         } = style.style;
                         fontWeights.add(fontWeight);
                         fontSizes.add(fontSize);
-                        // letterSpacings.add(letterSpacing);
-                        // lineHeights.add(lineHeight);
+                        letterSpacings.add(letterSpacing);
+                        lineHeights.add(lineHeight);
+
+                        const typography = {
+                            [fontFamily]: {
+                                [fontWeight]: {
+                                    [fontStyle]: fontPostScriptName,
+                                },
+                            },
+                        };
+
+                        obj.fontConfig = merge(obj.fontConfig, typography);
                         break;
                     }
                 }
             }
         });
-
         obj.fontWeights = fontWeightMapping(fontWeights);
-        obj.fontSizes = fontSizeMapping(fontSizes);
-        // obj.letterSpacings = Array.from(new Set(letterSpacings)).sort();
-        // obj.lineHeights = Array.from(new Set(lineHeights)).sort();
+        obj.fontSizes = sizeMapping(fontSizes);
+        obj.letterSpacings = letterSpaceMapping(letterSpacings);
+        obj.lineHeights = sizeMapping(lineHeights);
 
         const filePath = path.resolve(output);
         fs.mkdirSync(filePath, { recursive: true });

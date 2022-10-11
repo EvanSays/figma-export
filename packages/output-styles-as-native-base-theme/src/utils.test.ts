@@ -1,7 +1,12 @@
 import { expect } from 'chai';
 
 import {
-    writeVariable, rgba2hex, sortStringsOrNumbers, fontWeightMapping, fontSizeMapping,
+    writeVariable,
+    rgba2hex,
+    sortStringsOrNumbers,
+    fontWeightMapping,
+    sizeMapping,
+    letterSpaceMapping,
 } from './utils';
 
 describe('utils', () => {
@@ -30,10 +35,6 @@ describe('utils', () => {
                 expect(hex).to.eql('#51459e');
             });
 
-            // it('should format color object structure', () => {
-            //     const colors = formatColorObjects();
-            // })
-
             it('should sort array of strings or numbers', () => {
                 const numbers = sortStringsOrNumbers([0, 0.2, 0.6, -0.6, 18, 16, 24]);
                 expect(numbers).to.eql([-0.6, 0, 0.2, 0.6, 16, 18, 24]);
@@ -45,9 +46,15 @@ describe('utils', () => {
                 const nameObj = fontWeightMapping(new Set([400, 500]));
                 expect(nameObj).to.eql({ 400: 'normal', 500: 'medium' });
             });
-            it.only('should map font size to size names', () => {
-                const nameObj = fontSizeMapping(new Set([10, 26]));
+
+            it('should map font size to size names', () => {
+                const nameObj = sizeMapping(new Set([10, 26]));
                 expect(nameObj).to.eql({ '2xs': 10, '3xl': 26 });
+            });
+
+            it('should map letter spacing percentages to whole numbers for object keys', () => {
+                const nameObj = letterSpaceMapping(new Set([0.70, 0.50, 0.0]));
+                expect(nameObj).to.eql({ 0: 0, 50: 0.50, 70: 0.70 });
             });
 
             // it('should be able to print-out simple variable with an empty comment', () => {

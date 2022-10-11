@@ -60,10 +60,12 @@ const createTextStyle = (textNode: Figma.Style & Figma.Text): FigmaExport.TextSt
     const {
         fontFamily, fontWeight, fontSize, lineHeightPx, letterSpacing,
         italic, textCase, textDecoration, textAlignHorizontal, textAlignVertical,
+        fontPostScriptName,
     } = textNode.style;
 
     return {
         fontFamily,
+        fontPostScriptName,
         fontWeight,
         fontSize,
         letterSpacing,

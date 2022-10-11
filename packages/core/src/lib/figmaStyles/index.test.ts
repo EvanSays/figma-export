@@ -504,6 +504,7 @@ describe('figmaStyles.', () => {
                         originalNode: node,
                         style: {
                             fontFamily: 'Spinnaker',
+                            fontPostScriptName: 'Spinnaker-Regular',
                             fontSize: 24,
                             fontStyle: 'normal',
                             fontVariant: 'normal',

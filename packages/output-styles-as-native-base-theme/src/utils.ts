@@ -1,29 +1,9 @@
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-bitwise */
-// const sanitizeText = (text: string): string => {
-//     return text
-//         .replace(/^[^\S\r\n]+/gm, '')
-//         .replace(/^\*/gm, ' *')
-//         .replace(/^"/gm, '  "');
-// };
-
-// import { arrayBuffer } from 'stream/consumers';
-
-// const writeComment = (message: string): string => {
-//     return message && `/**
-//                         * ${message.replace(/\*\//g, '').split('\n').join('\n  * ')}
-//                         */`;
-// };
 
 type StyleFormat = {
     [key: string]: string
 }
-// const createVariable = (name: string, value: string): StyleFormat => {
-//     // eslint-disable-next-line default-case
-//     console.log("name", name)
-//     console.log("value", value)
-//     return { [name]: value };
-// };
 
 export const writeVariable = (name: string, value: string): StyleFormat => {
     if (value) {
@@ -74,7 +54,7 @@ export const fontWeightMapping = (fontWeights: Set<number>) => {
     }, {});
 };
 
-export const fontSizeMapping = (fontSizes: Set<number>) => {
+export const sizeMapping = (sizes: Set<number>) => {
     const mappings: Mapping = {
         10: '2xs',
         12: 'xs',
@@ -91,8 +71,16 @@ export const fontSizeMapping = (fontSizes: Set<number>) => {
         96: '8xl',
         128: '9xl',
     };
-    const sorted: number[] = Array.from(new Set(fontSizes)).sort();
+    const sorted: number[] = Array.from(new Set(sizes)).sort();
     return sorted.reduce((acc, key) => {
         return { ...acc, [mappings[key]]: key };
+    }, {});
+};
+
+export const letterSpaceMapping = (spacing: Set<number>) => {
+    const sorted: number[] = Array.from(new Set(spacing)).sort();
+    return sorted.reduce((acc, num) => {
+        const percentage = Math.floor(num * 100);
+        return { ...acc, [percentage]: num };
     }, {});
 };

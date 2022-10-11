@@ -28,6 +28,8 @@
     "dependencies": {
         "@figma-export/types": "^4.5.1",
         "@figma-export/utils": "^4.5.1",
+        "@types/lodash.merge": "^4.6.7",
+        "lodash.merge": "^4.6.2",
         "rgb-hex": "^4.0.0"
     },
     "engines": {
